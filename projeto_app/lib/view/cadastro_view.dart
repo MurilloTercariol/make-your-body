@@ -77,11 +77,11 @@ class _CadastroViewState extends State<CadastroView> {
                 width: 340,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9C22E).withOpacity(0.9),
+                  color: const Color(0xFFF9C22E),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black,
                       blurRadius: 10,
                       offset: const Offset(0, 6),
                     ),
@@ -393,7 +393,7 @@ class _CadastroViewState extends State<CadastroView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(mensagem),
-        backgroundColor: const Color.fromARGB(255, 240, 21, 21),
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         behavior: SnackBarBehavior.floating,
       ),
     );

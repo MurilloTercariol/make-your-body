@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:projeto_app/view/cadastro_view.dart';
 import 'package:projeto_app/view/home_view.dart';
+import 'package:projeto_app/view/esqueci_view.dart';
+import 'package:projeto_app/view/sobre_view.dart';
+import 'package:projeto_app/view/treino_view.dart';
 
 import 'controller/login_controller.dart';
 import 'view/login_view.dart';
@@ -26,6 +29,9 @@ class MainApp extends StatelessWidget {
         '/': (context) => const LoginView(), // tela inicial
         '/home': (context) => const HomeView(), // tela após login
         '/cadastro': (context) => const CadastroView(), // tela de cadastro
+        '/esqueci': (context) => const EsqueciView(), // tela recuperar senha
+        '/treino': (context) => TreinoView(), // tela treino
+        '/sobre':(context) => const SobreView() //tela sobre o app
       },
     );
   }
