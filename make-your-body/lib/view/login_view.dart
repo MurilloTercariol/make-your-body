@@ -13,6 +13,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true; // Adicione esta linha
   final LoginController _loginController = LoginController();
 
   @override
@@ -38,8 +39,18 @@ class _LoginViewState extends State<LoginView> {
     );
 
     var elevatedButton = ElevatedButton(
-      onPressed: () {
-        _loginController.login(_emailController.text, _passwordController.text);
+      onPressed: () async {
+        String? erro = await _loginController.loginComFirebase(
+          _emailController.text,
+          _passwordController.text,
+          context,
+        );
+
+        if (erro == null) {
+          // Login bem-sucedido - ir para a tela principal
+          Navigator.pushNamed(context, '/home');
+        }
+        // Se houver erro, o SnackBar já foi mostrado no controller
       },
       style: customButtonStyle,
       child: const Text(
@@ -130,10 +141,22 @@ class _LoginViewState extends State<LoginView> {
                     // Campo de senha
                     TextFormField(
                       controller: _passwordController,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         labelText: 'Senha',
                         prefixIcon: const Icon(Icons.lock_outlined),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
                           borderSide: const BorderSide(

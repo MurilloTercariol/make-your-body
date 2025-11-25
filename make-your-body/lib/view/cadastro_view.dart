@@ -19,6 +19,10 @@ class _CadastroViewState extends State<CadastroView> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  // Adicione estas duas linhas:
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   // Estados para os checkboxes
   bool _hiperChecked = false;
   bool _perderChecked = false;
@@ -145,7 +149,7 @@ class _CadastroViewState extends State<CadastroView> {
                     // Campo Senha
                     TextFormField(
                       controller: _passwordController,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         labelText: 'Senha',
                         prefixIcon: const Icon(Icons.lock_outlined),
@@ -163,6 +167,19 @@ class _CadastroViewState extends State<CadastroView> {
                             width: 2,
                           ),
                         ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.black54,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -170,7 +187,7 @@ class _CadastroViewState extends State<CadastroView> {
                     // Campo Confirmar Senha
                     TextFormField(
                       controller: _confirmPasswordController,
-                      obscureText: true,
+                      obscureText: _obscureConfirmPassword,
                       decoration: InputDecoration(
                         labelText: 'Confirmar Senha',
                         prefixIcon: const Icon(Icons.lock_outlined),
@@ -187,6 +204,20 @@ class _CadastroViewState extends State<CadastroView> {
                             color: Colors.black,
                             width: 2,
                           ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.black54,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
+                          },
                         ),
                       ),
                     ),
@@ -359,7 +390,7 @@ class _CadastroViewState extends State<CadastroView> {
   }
 
   // Método para cadastrar usuário
-  void _cadastrarUsuario() {
+  void _cadastrarUsuario() async {
     // Validações básicas
     if (_nomeController.text.isEmpty ||
         _emailController.text.isEmpty ||
@@ -379,14 +410,39 @@ class _CadastroViewState extends State<CadastroView> {
       return;
     }
 
+    //Código antigo antes do Firebase
     // Aqui você chamaria o método do controller para cadastrar
-    _cadastroController.cadastrarUsuario(
+    /*_cadastroController.cadastrarUsuario(
       _nomeController.text,
       _emailController.text,
       _passwordController.text,
     );
 
     _mostrarSnackBar('Cadastro realizado com sucesso!');
+  }
+   */
+
+    // Coletando objetivos selecionados
+    List<String> objetivos = [];
+    if (_perderChecked) objetivos.add('Perder Peso');
+    if (_hiperChecked) objetivos.add('Ganhar Massa Muscular');
+    if (_resilienciaChecked) objetivos.add('Resiliência');
+
+    String? erro = await _cadastroController.cadastrarUsuario(
+      nome: _nomeController.text,
+      email: _emailController.text,
+      senha: _passwordController.text,
+      objetivos: objetivos,
+    );
+
+    if (erro == null) {
+      // Sucesso! Usuário cadastrado
+      _mostrarSnackBar('Usuário cadastrado com sucesso!');
+      Navigator.pushNamed(context, '/');
+    } else {
+      // Erro - mostrar para o usuário
+      _mostrarSnackBar('Erro: $erro');
+    }
   }
 
   void _mostrarSnackBar(String mensagem) {

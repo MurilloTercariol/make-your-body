@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../controller/login_controller.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -31,8 +32,9 @@ class HomeView extends StatelessWidget {
                       Icons.exit_to_app,
                       color: Color(0xFFF9C22E),
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/');
+                    onPressed: () async {
+                      final loginController = LoginController();
+                      await loginController.logout(context);
                     },
                   ),
                 ],

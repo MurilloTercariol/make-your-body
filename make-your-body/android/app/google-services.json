@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "329848945484",
+    "project_id": "make-your-body",
+    "storage_bucket": "make-your-body.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329848945484:android:4d3f98ab79fc52ed2bede9",
+        "android_client_info": {
+          "package_name": "com.example.projeto_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS8opaUl8-BG1RdBASMIsFOYta7h20L0c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

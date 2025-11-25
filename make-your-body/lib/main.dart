@@ -1,3 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; // Importa o arquivo gerado pelo flutterfire configure
+
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -12,7 +15,9 @@ import 'view/login_view.dart';
 
 final g = GetIt.instance;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Registrando o LoginController como singleton
   g.registerSingleton<LoginController>(LoginController());
 
@@ -31,7 +36,7 @@ class MainApp extends StatelessWidget {
         '/cadastro': (context) => const CadastroView(), // tela de cadastro
         '/esqueci': (context) => const EsqueciView(), // tela recuperar senha
         '/treino': (context) => TreinoView(), // tela treino
-        '/sobre':(context) => const SobreView() //tela sobre o app
+        '/sobre': (context) => const SobreView(), //tela sobre o app
       },
     );
   }

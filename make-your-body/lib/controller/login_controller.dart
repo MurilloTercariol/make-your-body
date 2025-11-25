@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginController extends ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   // Variáveis para armazenar email e senha
+
   String email = '';
   String password = '';
 
@@ -18,19 +20,90 @@ class LoginController extends ChangeNotifier {
     return true;
   }
 
-  // Método principal de login
-  void login(String email, String password) {
-    this.email = email;
-    this.password = password;
-
-    if (authenticate()) {
-      print('✅ Login bem-sucedido');
-      Navigator.pushNamed(context!, '/home');
-    } else {
-      print('❌ Falha no login: campos vazios');
-      ScaffoldMessenger.of(context!).showSnackBar(
+  // Login com Firebase Auth
+  Future<String?> loginComFirebase(
+    String email,
+    String password,
+    BuildContext context,
+  ) async {
+    try {
+      // Mostra que está tentando
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Preencha todos os campos!'),
+          content: Text('🔄 Tentando fazer login...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+      // Mostra sucesso
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Login realizado com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      return null; // Sucesso - sem erro
+    } on FirebaseAuthException catch (e) {
+      String mensagem;
+      switch (e.code) {
+        case 'user-not-found':
+          mensagem = '❌ Usuário não encontrado';
+          break;
+        case 'wrong-password':
+        case 'invalid-credential':
+          mensagem = '❌ Email ou senha incorretos';
+          break;
+        case 'invalid-email':
+          mensagem = '❌ Email inválido';
+          break;
+        case 'user-disabled':
+          mensagem = '❌ Conta desativada';
+          break;
+        case 'too-many-requests':
+          mensagem = '❌ Muitas tentativas. Tente novamente mais tarde';
+          break;
+        default:
+          mensagem = '❌ Email ou senha incorretos';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mensagem), backgroundColor: Colors.red),
+      );
+
+      return mensagem;
+    }
+  }
+
+  // Logout
+  Future<void> logout(BuildContext context) async {
+    try {
+      // Mostra que está tentando
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('🔄 Fazendo logout...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      await _auth.signOut();
+
+      // Mostra sucesso
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Logout realizado com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+    } catch (e) {
+      // Mostra erro
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Erro no logout: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
