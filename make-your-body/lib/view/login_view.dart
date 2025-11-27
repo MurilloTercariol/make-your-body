@@ -1,7 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:projeto_app/controller/login_controller.dart';
+import 'package:get_it/get_it.dart';
+import '../controller/login_controller_basic.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -13,12 +14,12 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final LoginController _loginController = LoginController();
+  late final LoginControllerBasic _loginController;
 
   @override
   void initState() {
     super.initState();
-    _loginController.context = context;
+    _loginController = GetIt.instance.get<LoginControllerBasic>();
   }
 
   @override
@@ -26,6 +27,44 @@ class _LoginViewState extends State<LoginView> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fazerLogin() async {
+    final email = _emailController.text.trim();
+    final senha = _passwordController.text;
+
+    // Validar email
+    String? erro = _loginController.validarEmail(email);
+    if (erro != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    // Validar senha
+    erro = _loginController.validarSenha(senha);
+    if (erro != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    // Fazer login
+    erro = await _loginController.login(email: email, senha: senha);
+
+    if (!mounted) return;
+
+    if (erro == null) {
+      // Login bem-sucedido
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      // Erro no login
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -38,17 +77,30 @@ class _LoginViewState extends State<LoginView> {
     );
 
     var elevatedButton = ElevatedButton(
-      onPressed: () {
-        _loginController.login(_emailController.text, _passwordController.text);
-      },
+      onPressed: () => _fazerLogin(),
       style: customButtonStyle,
-      child: const Text(
-        'Entrar',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFFF9C22E),
-        ),
+      child: AnimatedBuilder(
+        animation: _loginController,
+        builder: (context, child) {
+          if (_loginController.isLoading) {
+            return const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Color(0xFFF9C22E),
+                strokeWidth: 2,
+              ),
+            );
+          }
+          return const Text(
+            'Entrar',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFF9C22E),
+            ),
+          );
+        },
       ),
     );
 

@@ -1,0 +1,67 @@
+import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+
+class CadastroController extends ChangeNotifier {
+  final AuthService _authService;
+  bool _isLoading = false;
+
+  CadastroController({required AuthService authService})
+    : _authService = authService;
+
+  bool get isLoading => _isLoading;
+
+  // Validações básicas
+  String? validarCadastro({
+    required String nome,
+    required String email,
+    required String senha,
+    required String confirmacaoSenha,
+    required bool temObjetivos,
+    required bool aceitouTermos,
+    required bool aceitouPolitica,
+  }) {
+    if (nome.trim().isEmpty) return 'Nome é obrigatório';
+    if (nome.trim().length < 2) return 'Nome deve ter pelo menos 2 caracteres';
+    if (email.trim().isEmpty) return 'E-mail é obrigatório';
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email.trim())) {
+      return 'Formato de e-mail inválido';
+    }
+    if (senha.isEmpty) return 'Senha é obrigatória';
+    if (senha.length < 6) return 'Senha deve ter pelo menos 6 caracteres';
+    if (senha != confirmacaoSenha) return 'As senhas não coincidem';
+    if (!temObjetivos) return 'Selecione pelo menos um objetivo';
+    if (!aceitouTermos || !aceitouPolitica) {
+      return 'Aceite os termos de uso e política de privacidade';
+    }
+
+    return null; // null significa que não há erros
+  }
+
+  // Cadastrar usuário com Firebase
+  Future<String?> cadastrarUsuario({
+    required String nome,
+    required String email,
+    required String senha,
+  }) async {
+    _setLoading(true);
+
+    try {
+      String? erro = await _authService.cadastrarUsuario(
+        nome: nome.trim(),
+        email: email.trim(),
+        senha: senha,
+      );
+
+      return erro; // null se sucesso, string se erro
+    } catch (e) {
+      return 'Erro inesperado: $e';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+}

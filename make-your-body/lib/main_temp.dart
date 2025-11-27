@@ -1,20 +1,12 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-// import 'package:firebase_core/firebase_core.dart'; // Firebase removido
 import 'package:projeto_app/view/cadastro_view.dart';
 import 'package:projeto_app/view/home_view.dart';
 import 'package:projeto_app/view/esqueci_view.dart';
 import 'package:projeto_app/view/sobre_view.dart';
 import 'package:projeto_app/view/treino_view.dart';
 import 'package:projeto_app/view/montetreino_view.dart';
-// import 'package:projeto_app/view/meustreinos_view.dart';
-// import 'package:projeto_app/view/executar_treino_view.dart';
-// import 'package:projeto_app/view/splash_view.dart';
-
-import 'controller/login_controller_basic.dart';
-import 'controller/cadastro_controller_basic.dart';
-import 'controller/esqueci_controller_basic.dart';
 import 'controller/montetreino_controller.dart';
 import 'view/login_view.dart';
 
@@ -24,9 +16,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Registrar controllers básicos (sem Firebase)
-  g.registerSingleton<LoginControllerBasic>(LoginControllerBasic());
-  g.registerSingleton<CadastroControllerBasic>(CadastroControllerBasic());
-  g.registerSingleton<EsqueciControllerBasic>(EsqueciControllerBasic());
   g.registerSingleton<MontetreinoController>(MontetreinoController());
 
   runApp(DevicePreview(enabled: true, builder: (context) => const MainApp()));
@@ -40,18 +29,18 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         '/': (context) => const LoginView(), // tela inicial
-        '/login': (context) => const LoginView(), // tela de login
         '/home': (context) => const HomeView(), // tela após login
         '/cadastro': (context) => const CadastroView(), // tela de cadastro
         '/esqueci': (context) => const EsqueciView(), // tela recuperar senha
         '/treino': (context) => TreinoView(), // tela treino
-        '/sobre': (context) => const SobreView(), //tela sobre o app
+        '/sobre': (context) => const SobreView(), // tela sobre
         '/montetreino': (context) =>
-            const MonteTreinoView(), // tela monte seu treino
-        // Firebase views temporariamente desabilitadas
-        // '/meustreinos': (context) => const MeusTreinosView(),
-        // '/executartreino': (context) => const ExecutarTreinoView(),
+            const MonteTreinoView(), // tela monte treino
       },
+      debugShowCheckedModeBanner: false,
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
     );
   }
 }

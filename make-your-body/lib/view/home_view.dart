@@ -114,6 +114,38 @@ class HomeView extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 16),
+
+              // Botão "Monte seu Treino"
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    minimumSize: const Size(340, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: const BorderSide(
+                        color: Color(0xFFF9C22E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/montetreino');
+                  },
+                  child: const Text(
+                    'MONTE SEU TREINO',
+                    style: TextStyle(
+                      color: Color(0xFFF9C22E),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'LeagueGothic',
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 24),
 
               // Texto "ÚLTIMO TREINO:"
@@ -298,7 +330,12 @@ class HomeView extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Icon(Icons.shopping_cart, color: Colors.black, size: 28),
+            IconButton(
+              icon: Icon(Icons.fitness_center, color: Colors.black, size: 28),
+              onPressed: () {
+                Navigator.pushNamed(context, '/meustreinos');
+              },
+            ),
             Icon(Icons.menu, color: Colors.black, size: 28),
             IconButton(
               icon: Icon(Icons.help_outline, color: Colors.black, size: 28),

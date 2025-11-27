@@ -1,0 +1,40 @@
+import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+
+class EsqueciController extends ChangeNotifier {
+  final AuthService _authService;
+  bool _isLoading = false;
+
+  EsqueciController({required AuthService authService})
+    : _authService = authService;
+
+  bool get isLoading => _isLoading;
+
+  // Validar email
+  String? validarEmail(String email) {
+    if (email.trim().isEmpty) return 'E-mail é obrigatório';
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email.trim())) {
+      return 'Formato de e-mail inválido';
+    }
+    return null;
+  }
+
+  // Recuperar senha com Firebase
+  Future<String?> recuperarSenha(String email) async {
+    _setLoading(true);
+
+    try {
+      String? erro = await _authService.recuperarSenha(email: email.trim());
+      return erro; // null se sucesso, string se erro
+    } catch (e) {
+      return 'Erro inesperado: $e';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+}

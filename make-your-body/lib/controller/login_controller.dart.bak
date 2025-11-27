@@ -1,0 +1,52 @@
+import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+
+class LoginController extends ChangeNotifier {
+  final AuthService _authService;
+  bool _isLoading = false;
+
+  LoginController({required AuthService authService})
+    : _authService = authService;
+
+  bool get isLoading => _isLoading;
+
+  // Validações básicas
+  String? validarLogin({required String email, required String senha}) {
+    if (email.trim().isEmpty) return 'E-mail é obrigatório';
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email.trim())) {
+      return 'Formato de e-mail inválido';
+    }
+    if (senha.isEmpty) return 'Senha é obrigatória';
+    if (senha.length < 6) return 'Senha deve ter pelo menos 6 caracteres';
+
+    return null; // null significa que não há erros
+  }
+
+  // Login com Firebase
+  Future<String?> login({required String email, required String senha}) async {
+    _setLoading(true);
+
+    try {
+      String? erro = await _authService.loginUsuario(
+        email: email.trim(),
+        senha: senha,
+      );
+
+      return erro; // null se sucesso, string se erro
+    } catch (e) {
+      return 'Erro inesperado: $e';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Logout
+  Future<void> logout() async {
+    await _authService.logout();
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+}

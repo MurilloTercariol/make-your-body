@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_app/controller/esqueci_controller.dart';
+import 'package:get_it/get_it.dart';
+import 'package:projeto_app/controller/esqueci_controller_basic.dart';
 
 class EsqueciView extends StatefulWidget {
   const EsqueciView({super.key});
-  
+
   @override
   State<EsqueciView> createState() => _EsqueciViewState();
 }
 
-
 class _EsqueciViewState extends State<EsqueciView> {
   final TextEditingController _controller = TextEditingController();
-  final EsqueciController _esqueciController = EsqueciController(); 
-  
+  late final EsqueciControllerBasic _esqueciController;
+
+  @override
+  void initState() {
+    super.initState();
+    _esqueciController = GetIt.instance.get<EsqueciControllerBasic>();
+  }
+
   @override
   Widget build(BuildContext context) {
     //TÍTULO
@@ -26,8 +32,8 @@ class _EsqueciViewState extends State<EsqueciView> {
             fontSize: 20,
             fontWeight: FontWeight.w600,
             fontFamily: 'LeagueGothic',
-            ),
           ),
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -35,7 +41,6 @@ class _EsqueciViewState extends State<EsqueciView> {
             Navigator.pop(context);
           },
         ),
-        
       ),
       // CAIXA DE TEXTO E MENSAGEM PARA INSERIR DADOS
       body: Padding(
@@ -52,12 +57,11 @@ class _EsqueciViewState extends State<EsqueciView> {
                 color: Color(0xFFF9C22E),
                 fontSize: 16,
               ),
-
             ),
             const SizedBox(height: 20),
             TextField(
               controller: _controller,
-              style:const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'E-mail',
                 border: OutlineInputBorder(),
@@ -66,20 +70,46 @@ class _EsqueciViewState extends State<EsqueciView> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              onPressed: () async {
+                final email = _controller.text.trim();
 
-              onPressed: () {
-                _esqueciController.verificaemail(
-                  context,
-                  _controller.text,
-                );
+                // Validar email
+                final validacao = _esqueciController.validarEmail(email);
+                if (validacao != null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(validacao)));
+                  return;
+                }
+
+                // Recuperar senha
+                final erro = await _esqueciController.recuperarSenha(email);
+
+                if (!mounted) return;
+
+                if (erro != null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Erro: $erro')));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('E-mail de recuperação enviado!'),
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                }
               },
               style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                      backgroundColor: Color(0xFFF9C22E),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 15,
+                  horizontal: 30,
+                ),
+                backgroundColor: Color(0xFFF9C22E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               child: const Text(
                 'Enviar Link',
                 style: TextStyle(
