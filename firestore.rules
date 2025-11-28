@@ -2,6 +2,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Regra para a coleção de usuários
+    match /usuarios/{userId} {
+      // Permite que o usuário leia e escreva apenas seus próprios dados
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Permite criar documento durante o cadastro
+      allow create: if request.auth != null;
+    }
+    
+    // Regra para a coleção users (compatibilidade)
     match /users/{userId} {
       // Permite que o usuário leia e escreva apenas seus próprios dados
       allow read, write: if request.auth != null && request.auth.uid == userId;

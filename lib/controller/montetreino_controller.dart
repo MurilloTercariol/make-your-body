@@ -22,45 +22,58 @@ class MontetreinoController extends ChangeNotifier {
   // Lista de grupos musculares para filtro
   List<String> get gruposMusculares => [
     'all',
-    'chest',
-    'back',
-    'shoulders',
+    'abductors',
+    'adductors',
     'biceps',
+    'calves',
+    'chest',
+    'forearms',
+    'glutes',
+    'hamstrings',
+    'lats',
+    'lower_back',
+    'middle_back',
+    'neck',
+    'quadriceps',
+    'traps',
     'triceps',
-    'legs',
-    'abs',
-    'cardio',
-  ];
+    ];
 
   // Mapear nomes dos músculos para português
   String nomeMusculoPortugues(String musculo) {
     switch (musculo.toLowerCase()) {
-      case 'chest':
-        return 'Peito';
-      case 'back':
-        return 'Costas';
-      case 'shoulders':
-        return 'Ombros';
+      case 'abductors':
+        return 'Abdutores';
+      case 'adductors':
+        return 'Adutores';
       case 'biceps':
         return 'Bíceps';
-      case 'triceps':
-        return 'Tríceps';
-      case 'legs':
-        return 'Pernas';
-      case 'quads':
-        return 'Quadríceps';
-      case 'hamstrings':
-        return 'Posterior';
       case 'calves':
         return 'Panturrilha';
+      case 'chest':
+        return 'Peito';
+      case 'forearms':
+        return 'Antebraços';
       case 'glutes':
         return 'Glúteos';
-      case 'abs':
-        return 'Abdomen';
-      case 'cardio':
-        return 'Cardio';
+      case 'hamstrings':
+        return 'Posterior';
+      case 'lats':
+        return 'Dorsais';
+      case 'lower_back':
+        return 'Parte Inferior das Costas';
+      case 'middle_back':
+        return 'Parte Média das Costas';
+      case 'neck':
+        return 'Pescoço';
+      case 'quadriceps':
+        return 'Quadríceps';
+      case 'traps':
+        return 'Trapézio';
       case 'all':
         return 'Todos';
+      case 'triceps':
+        return 'Tríceps';
       default:
         return musculo;
     }
@@ -76,13 +89,22 @@ class MontetreinoController extends ChangeNotifier {
       List<ExercicioModel> todosExercicios = [];
 
       for (String musculo in [
+        'all',
+        'abductors',
+        'adductors',
         'biceps',
-        'triceps',
+        'calves',
         'chest',
-        'back',
-        'shoulders',
-        'legs',
-        'abs',
+        'forearms',
+        'glutes',
+        'hamstrings',
+        'lats',
+        'lower_back',
+        'middle_back',
+        'neck',
+        'quadriceps',
+        'traps',
+        'triceps',
       ]) {
         final response = await http.get(
           Uri.parse('https://api.api-ninjas.com/v1/exercises?muscle=$musculo'),

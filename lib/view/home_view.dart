@@ -58,15 +58,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Color(0xFFF9C22E),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
                   Row(
                     children: [
                       IconButton(

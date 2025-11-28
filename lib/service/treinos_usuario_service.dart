@@ -15,7 +15,7 @@ class TreinosUsuarioService {
   // Referência para a coleção de treinos do usuário
   CollectionReference? get _treinosCollection {
     if (_userId == null) return null;
-    return _db.collection('users').doc(_userId).collection('treinos');
+    return _db.collection('treinos').doc(_userId).collection('meus_treinos');
   }
 
   // CREATE - Criar novo treino
@@ -31,7 +31,7 @@ class TreinosUsuarioService {
       print('🔵 Iniciando criação de treino...');
       print('🔵 Current User Email: ${currentUser?.email}');
       print('🔵 Current User ID: ${currentUser?.uid}');
-      print('🔵 Caminho: users/${currentUser?.uid}/treinos');
+      print('🔵 Caminho: treinos/${currentUser?.uid}/meus_treinos');
 
       if (currentUser == null || currentUser.uid.isEmpty) {
         print('❌ ERRO: Usuário não autenticado ou UID vazio!');
@@ -39,8 +39,8 @@ class TreinosUsuarioService {
       }
 
       // Criar referência diretamente com o UID do usuário logado
-      final userDoc = _db.collection('users').doc(currentUser.uid);
-      final treinosCollection = userDoc.collection('treinos');
+      final userDoc = _db.collection('treinos').doc(currentUser.uid);
+      final treinosCollection = userDoc.collection('meus_treinos');
       final treinoDoc = treinosCollection.doc();
 
       print('🔵 ID do documento do treino: ${treinoDoc.id}');
@@ -79,12 +79,12 @@ class TreinosUsuarioService {
       }
 
       print('🔵 Listando treinos do usuário: ${currentUser.email}');
-      print('🔵 Path: users/${currentUser.uid}/treinos');
+      print('🔵 Path: treinos/${currentUser.uid}/meus_treinos');
 
       final snapshot = await _db
-          .collection('users')
-          .doc(currentUser.uid)
           .collection('treinos')
+          .doc(currentUser.uid)
+          .collection('meus_treinos')
           .orderBy('dataCriacao', descending: true)
           .get();
 

@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, avoid_print, unused_element
 
 import 'package:flutter/material.dart';
 import '../controller/executar_treino_controller.dart';
@@ -14,24 +14,31 @@ class ExecutarTreinoView extends StatefulWidget {
 
 class _ExecutarTreinoViewState extends State<ExecutarTreinoView> {
   final ExecutarTreinoController _controller = ExecutarTreinoController();
+  bool _treinoJaFoiCarregado = false;
 
   @override
   void initState() {
     super.initState();
     _controller.carregarConfiguracoes();
+    
+    // Carregar o treino após o build ser concluído
+    Future.microtask(() {
+      if (mounted && !_treinoJaFoiCarregado) {
+        final TreinoSalvoModel? treino =
+            ModalRoute.of(context)?.settings.arguments as TreinoSalvoModel?;
+        
+        if (treino != null) {
+          _treinoJaFoiCarregado = true;
+          _controller.iniciarTreino(treino);
+        }
+      }
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // Recebe o treino passado como argumento
-    final TreinoSalvoModel? treino =
-        ModalRoute.of(context)?.settings.arguments as TreinoSalvoModel?;
-
-    if (treino != null && _controller.treinoAtual == null) {
-      _controller.iniciarTreino(treino);
-    }
+    // Removido - agora carregado no initState com Future.microtask
   }
 
   @override
@@ -436,7 +443,13 @@ class _ExecutarTreinoViewState extends State<ExecutarTreinoView> {
             const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: _controller.proximoExercicio,
+                onPressed: () {
+                  if (_controller.isUltimoExercicio) {
+                    _mostrarTelaParabens();
+                  } else {
+                    _controller.proximoExercicio();
+                  }
+                },
                 icon: const Icon(Icons.skip_next),
                 label: Text(
                   _controller.isUltimoExercicio ? 'FINALIZAR' : 'PRÓXIMO',
@@ -457,7 +470,15 @@ class _ExecutarTreinoViewState extends State<ExecutarTreinoView> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: _controller.finalizarSerie,
+            onPressed: () {
+              if (_controller.isUltimaSerie && _controller.isUltimoExercicio) {
+                // Finalizar treino - mostrar tela de parabéns
+                _mostrarTelaParabens();
+              } else {
+                // Continuar treino normalmente
+                _controller.finalizarSerie();
+              }
+            },
             icon: const Icon(Icons.check_circle),
             label: Text(
               _controller.isUltimaSerie && _controller.isUltimoExercicio
@@ -703,5 +724,138 @@ class _ExecutarTreinoViewState extends State<ExecutarTreinoView> {
       default:
         return musculo;
     }
+  }
+
+  void _mostrarTelaParabens() {
+    _controller.finalizarTreino();
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          backgroundColor: Colors.black,
+          elevation: 0,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Ícone de celebração
+              const Icon(
+                Icons.celebration,
+                size: 64,
+                color: Color(0xFFF9C22E),
+              ),
+              const SizedBox(height: 24),
+
+              // Título
+              const Text(
+                'PARABÉNS!',
+                style: TextStyle(
+                  color: Color(0xFFF9C22E),
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'LeagueGothic',
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+
+              // Mensagem de sucesso
+              Text(
+                'Seu treino "${_controller.treinoAtual?.nome ?? 'Treino'}" foi concluído com sucesso!',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+
+              // Detalhes do treino
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Exercícios completados:',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        Text(
+                          '${_controller.treinoAtual?.exercicios.length ?? 0}',
+                          style: const TextStyle(
+                            color: Color(0xFFF9C22E),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Data e hora:',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        Text(
+                          _formatarDataHora(DateTime.now()),
+                          style: const TextStyle(
+                            color: Color(0xFFF9C22E),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Botão voltar para home
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context); // Fechar dialog
+                    Navigator.pop(context); // Voltar de ExecutarTreino
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/home',
+                      (route) => false,
+                    );
+                  },
+                  icon: const Icon(Icons.home),
+                  label: const Text(
+                    'VOLTAR PARA HOME',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF9C22E),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatarDataHora(DateTime data) {
+    return '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year} - ${data.hour.toString().padLeft(2, '0')}:${data.minute.toString().padLeft(2, '0')}';
   }
 }

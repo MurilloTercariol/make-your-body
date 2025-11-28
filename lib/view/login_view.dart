@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import '../controller/login_controller.dart';
@@ -99,12 +100,19 @@ class _LoginViewState extends State<LoginView> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 80),
-              Image.asset(
-                'Logo2.png',
-                width: 175,
-                height: 175,
-                fit: BoxFit.contain,
-              ),
+              kIsWeb 
+                ? Image.network(
+                    'assets/assets/Logo2.png',
+                    width: 175,
+                    height: 175,
+                    fit: BoxFit.contain,
+                  )
+                : Image.asset(
+                    'Logo2.png',
+                    width: 175,
+                    height: 175,
+                    fit: BoxFit.contain,
+                  ),
               const SizedBox(height: 30),
 
               Container(

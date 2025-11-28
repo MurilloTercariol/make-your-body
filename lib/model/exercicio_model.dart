@@ -19,11 +19,11 @@ class ExercicioModel {
 
   factory ExercicioModel.fromJson(Map<String, dynamic> json) {
     return ExercicioModel(
-      id: json['name'] ?? '',
+      id: '${json['name']}_${json['muscle']}_${json['equipment']}'.replaceAll(' ', '_').toLowerCase(),
       name: json['name'] ?? 'Exercício',
       type: json['type'] ?? 'cardio',
       muscle: json['muscle'] ?? 'unknown',
-      equipment: json['equipment'] ?? 'none',
+      equipment: json['equipment']?.toString() ?? 'body_only',
       difficulty: json['difficulty'] ?? 'beginner',
       instructions: json['instructions'] ?? 'Sem instruções disponíveis',
     );

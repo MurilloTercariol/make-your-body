@@ -13,6 +13,7 @@ class MeusTreinosView extends StatefulWidget {
 class _MeusTreinosViewState extends State<MeusTreinosView>
     with WidgetsBindingObserver {
   late final MeusTreinosController _controller;
+  String _pesquisa = '';
 
   @override
   void initState() {
@@ -82,20 +83,102 @@ class _MeusTreinosViewState extends State<MeusTreinosView>
             );
           }
 
+          // Filtrar treinos baseado na pesquisa
+          final treinosFiltrados = _controller.treinos
+              .where((treino) =>
+                  treino.nome.toLowerCase().contains(_pesquisa.toLowerCase()))
+              .toList();
+
           if (_controller.treinos.isEmpty) {
             return _buildEstadoVazio();
           }
 
-          return RefreshIndicator(
-            onRefresh: _carregarTreinos,
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _controller.treinos.length,
-              itemBuilder: (context, index) {
-                final treino = _controller.treinos[index];
-                return _buildCardTreino(treino);
-              },
-            ),
+          return Column(
+            children: [
+              // Barra de pesquisa
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      _pesquisa = value;
+                    });
+                  },
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Pesquisar treino...',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    suffixIcon: _pesquisa.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () {
+                              setState(() {
+                                _pesquisa = '';
+                              });
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.grey[900],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFF9C22E),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFF9C22E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Lista de treinos
+              Expanded(
+                child: treinosFiltrados.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.search_off,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Nenhum treino encontrado para "$_pesquisa"',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _carregarTreinos,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: treinosFiltrados.length,
+                          itemBuilder: (context, index) {
+                            final treino = treinosFiltrados[index];
+                            return _buildCardTreino(treino);
+                          },
+                        ),
+                      ),
+              ),
+            ],
           );
         },
       ),

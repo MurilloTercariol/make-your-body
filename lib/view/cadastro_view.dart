@@ -12,18 +12,15 @@ class CadastroView extends StatefulWidget {
 class _CadastroViewState extends State<CadastroView> {
   late final CadastroController _cadastroController;
 
-  // Controllers para os campos de texto
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  // Adicione estas duas linhas:
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  // Estados para os checkboxes
   bool _hiperChecked = false;
   bool _perderChecked = false;
   bool _resilienciaChecked = false;
@@ -125,8 +122,6 @@ class _CadastroViewState extends State<CadastroView> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Campo Email
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -395,9 +390,7 @@ class _CadastroViewState extends State<CadastroView> {
     );
   }
 
-  // Método para cadastrar usuário
   void _cadastrarUsuario() async {
-    // Validações básicas
     if (_nomeController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -416,23 +409,15 @@ class _CadastroViewState extends State<CadastroView> {
       return;
     }
 
-    //Código antigo antes do Firebase
-    // Aqui você chamaria o método do controller para cadastrar
-    /*_cadastroController.cadastrarUsuario(
-      _nomeController.text,
-      _emailController.text,
-      _passwordController.text,
-    );
-
-    _mostrarSnackBar('Cadastro realizado com sucesso!');
-  }
-   */
-
-    // Coletando objetivos selecionados
     List<String> objetivos = [];
     if (_perderChecked) objetivos.add('Perder Peso');
     if (_hiperChecked) objetivos.add('Ganhar Massa Muscular');
     if (_resilienciaChecked) objetivos.add('Resiliência');
+
+    if (objetivos.isEmpty) {
+      _mostrarSnackBar('Selecione pelo menos um objetivo');
+      return;
+    }
 
     String? erro = await _cadastroController.cadastrarUsuario(
       nome: _nomeController.text,
@@ -442,11 +427,9 @@ class _CadastroViewState extends State<CadastroView> {
     );
 
     if (erro == null) {
-      // Sucesso! Usuário cadastrado
       _mostrarSnackBar('Usuário cadastrado com sucesso!');
       Navigator.pushNamed(context, '/');
     } else {
-      // Erro - mostrar para o usuário
       _mostrarSnackBar('Erro: $erro');
     }
   }
@@ -456,14 +439,12 @@ class _CadastroViewState extends State<CadastroView> {
       SnackBar(
         content: Text(mensagem),
         backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-        behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
   @override
   void dispose() {
-    // Limpa os controllers quando o widget for destruído
     _nomeController.dispose();
     _emailController.dispose();
     _passwordController.dispose();

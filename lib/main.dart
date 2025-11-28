@@ -4,7 +4,6 @@ import 'firebase_options.dart'; // Importa o arquivo gerado pelo flutterfire con
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-// import 'package:firebase_core/firebase_core.dart'; // Firebase removido
 import 'package:projeto_app/view/cadastro_view.dart';
 import 'package:projeto_app/view/home_view.dart';
 import 'package:projeto_app/view/esqueci_view.dart';

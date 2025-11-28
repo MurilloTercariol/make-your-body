@@ -13,6 +13,7 @@ class MonteTreinoView extends StatefulWidget {
 
 class _MonteTreinoViewState extends State<MonteTreinoView> {
   final MontetreinoController _controller = MontetreinoController();
+  String _pesquisa = '';
 
   @override
   void initState() {
@@ -105,6 +106,55 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
               // Filtro por grupo muscular
               _buildFiltroMusculo(),
 
+              // Barra de pesquisa
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      _pesquisa = value;
+                    });
+                  },
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Pesquisar exercício...',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    suffixIcon: _pesquisa.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () {
+                              setState(() {
+                                _pesquisa = '';
+                              });
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.grey[900],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFF9C22E),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFF9C22E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
               // Lista de exercícios
               Expanded(child: _buildListaExercicios()),
             ],
@@ -174,6 +224,16 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
   }
 
   Widget _buildListaExercicios() {
+    // Filtrar exercícios por pesquisa (case-insensitive)
+    final exerciciosFiltrados = _controller.exerciciosFiltrados
+        .where((exercicio) =>
+            exercicio.name.toLowerCase().contains(_pesquisa.toLowerCase()) ||
+            _controller
+                .nomeMusculoPortugues(exercicio.muscle)
+                .toLowerCase()
+                .contains(_pesquisa.toLowerCase()))
+        .toList();
+
     if (_controller.exerciciosFiltrados.isEmpty) {
       return const Center(
         child: Text(
@@ -183,11 +243,27 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
       );
     }
 
+    if (exerciciosFiltrados.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.search_off, size: 48, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              'Nenhum exercício encontrado para "$_pesquisa"',
+              style: const TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          ],
+        ),
+      );
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: _controller.exerciciosFiltrados.length,
+      itemCount: exerciciosFiltrados.length,
       itemBuilder: (context, index) {
-        final exercicio = _controller.exerciciosFiltrados[index];
+        final exercicio = exerciciosFiltrados[index];
         final isSelected = _controller.isExercicioSelecionado(exercicio);
 
         return Card(
@@ -554,6 +630,7 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
         SnackBar(
           content: Text('✅ Treino "$nome" salvo com sucesso!'),
           backgroundColor: Colors.green,
+          duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: 'Ver Treinos',
             textColor: Colors.white,
