@@ -9,8 +9,6 @@ import 'package:projeto_app/view/cadastro_view.dart';
 import 'package:projeto_app/view/home_view.dart';
 import 'package:projeto_app/view/esqueci_view.dart';
 import 'package:projeto_app/view/sobre_view.dart';
-import 'package:projeto_app/view/treino_view.dart';
-import 'package:projeto_app/view/tiposdetreinos_view.dart';
 import 'package:projeto_app/view/montetreino_view.dart';
 import 'package:projeto_app/view/meustreinos_view.dart';
 import 'package:projeto_app/view/perfilusuario_view.dart';
@@ -48,19 +46,12 @@ class MainApp extends StatelessWidget {
         '/home': (context) => const HomeView(), // tela após login
         '/cadastro': (context) => const CadastroView(), // tela de cadastro
         '/esqueci': (context) => const EsqueciView(), // tela recuperar senha
-        '/treino': (context) => TreinoView(), // tela treino
         '/sobre': (context) => const SobreView(), //tela sobre o app
-        '/tiposdetreinos': (context) =>
-            const TiposdetreinosView(), // tipos de treino
-        '/montetreino': (context) =>
-            const MonteTreinoView(), // monte seu treino
+        '/montetreino': (context) => const MonteTreinoView(), // monte seu treino
         '/meustreinos': (context) => const MeusTreinosView(), // meus treinos
-        '/perfilusuario': (context) =>
-            const PerfilUsuarioView(), // perfil do usuário
-        '/executartreino': (context) =>
-            const ExecutarTreinoView(), // executar treino
-        '/selecionartreino': (context) =>
-            const SelecionarTreinoView(), // selecionar treino para executar
+        '/perfilusuario': (context) => const PerfilUsuarioView(), // perfil do usuário
+        '/executartreino': (context) => const ExecutarTreinoView(), // executar treino
+        '/selecionartreino': (context) => const SelecionarTreinoView(), // selecionar treino para executar
       },
     );
   }

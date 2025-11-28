@@ -95,16 +95,6 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => _controller.buscarExercicios(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF9C22E),
-                    ),
-                    child: const Text(
-                      'Tentar Novamente',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
                 ],
               ),
             );

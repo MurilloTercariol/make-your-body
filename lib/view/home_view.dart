@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_underscores
+
 import 'package:flutter/material.dart';
 import '../controller/login_controller.dart';
 import '../service/treinos_usuario_service.dart';
