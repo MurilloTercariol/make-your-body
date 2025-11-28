@@ -42,6 +42,8 @@ class LoginController extends ChangeNotifier {
         const SnackBar(
           content: Text('✅ Login realizado com sucesso!'),
           backgroundColor: Colors.green,
+
+          
         ),
       );
 
@@ -88,7 +90,8 @@ class LoginController extends ChangeNotifier {
         ),
       );
 
-      await _auth.signOut();
+
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
 
       // Mostra sucesso
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +101,8 @@ class LoginController extends ChangeNotifier {
         ),
       );
 
-      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      await _auth.signOut();
+
     } catch (e) {
       // Mostra erro
       ScaffoldMessenger.of(context).showSnackBar(

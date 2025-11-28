@@ -101,7 +101,7 @@ class HomeView extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/treino');
+                    Navigator.pushNamed(context, '/tiposdetreinos');
                   },
                   child: const Text(
                     'PUMP!',
@@ -308,7 +308,12 @@ class HomeView extends StatelessWidget {
                 Navigator.pushNamed(context, '/sobre');
               },
             ),
-            Icon(Icons.person_outline, color: Colors.black, size: 28),
+            IconButton(
+              icon: Icon(Icons.person_outline, color: Colors.black, size: 28),
+              onPressed: () {
+                Navigator.pushNamed(context,'/perfilusuario');
+              },
+            ),
           ],
         ),
       ),
