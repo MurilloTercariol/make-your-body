@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+import '../model/treino_salvo_model.dart';
+import '../model/exercicio_model.dart';
+import '../services/firestore_treinos_service.dart';
+
+class MeusTreinosController extends ChangeNotifier {
+  final FirestoreTreinosService _firestoreService;
+
+  MeusTreinosController({required FirestoreTreinosService firestoreService})
+    : _firestoreService = firestoreService {
+    // Escutar mudanças no serviço Firestore
+    _firestoreService.addListener(_onFirestoreUpdate);
+  }
+
+  List<TreinoSalvoModel> get treinos => _firestoreService.treinos;
+  bool get isLoading => _firestoreService.isLoading;
+
+  void _onFirestoreUpdate() {
+    notifyListeners();
+  }
+
+  // Carregar treinos do Firestore
+  Future<void> carregarTreinos() async {
+    await _firestoreService.carregarTreinos();
+  }
+
+  // Adicionar novo treino
+  Future<String?> adicionarTreino(
+    String nome,
+    List<ExercicioModel> exercicios,
+  ) async {
+    return await _firestoreService.adicionarTreino(nome, exercicios);
+  }
+
+  // Editar nome do treino
+  Future<String?> editarNomeTreino(String treinoId, String novoNome) async {
+    return await _firestoreService.editarNomeTreino(treinoId, novoNome);
+  }
+
+  // Excluir treino
+  Future<String?> excluirTreino(String treinoId) async {
+    return await _firestoreService.excluirTreino(treinoId);
+  }
+
+  // Duplicar treino
+  Future<String?> duplicarTreino(TreinoSalvoModel treino) async {
+    return await _firestoreService.duplicarTreino(treino);
+  }
+
+  // Marcar treino como executado
+  Future<String?> marcarTreinoExecutado(String treinoId) async {
+    return await _firestoreService.marcarTreinoExecutado(treinoId);
+  }
+
+  // Obter treino por ID
+  TreinoSalvoModel? obterTreino(String treinoId) {
+    return _firestoreService.obterTreino(treinoId);
+  }
+
+  // Obter estatísticas
+  Future<Map<String, dynamic>> obterEstatisticas() async {
+    return await _firestoreService.obterEstatisticas();
+  }
+
+  @override
+  void dispose() {
+    _firestoreService.removeListener(_onFirestoreUpdate);
+    super.dispose();
+  }
+}

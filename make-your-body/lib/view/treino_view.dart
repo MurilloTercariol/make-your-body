@@ -52,7 +52,7 @@ class TreinoView extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'faça valer.',
+                          'faca valer.',
                           style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ],
@@ -61,7 +61,7 @@ class TreinoView extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   const Text(
-                    'TREINO A (PEITO + TRÍCEPS):',
+                    'TREINO A (PEITO + TRICEPS):',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -70,7 +70,7 @@ class TreinoView extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // 👉 Container com ListView dentro
+                  // Container com ListView dentro
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(top: 4),
@@ -87,7 +87,7 @@ class TreinoView extends StatelessWidget {
                           SizedBox(height: 8),
 
                           ExerciseTile(
-                            name: 'Supino Vertical Máquina',
+                            name: 'Supino Vertical Maquina',
                             series: '4x12',
                             tempo: "1'30\"",
                             image: 'SupinoMaquina.png',
@@ -132,7 +132,7 @@ class TreinoView extends StatelessWidget {
                           SizedBox(height: 8),
 
                           ExerciseTile(
-                            name: 'Tríceps Francês',
+                            name: 'Triceps Frances',
                             series: '4x12',
                             tempo: "1'30\"",
                             image: 'TricepsFrances.png',
@@ -141,7 +141,7 @@ class TreinoView extends StatelessWidget {
                           SizedBox(height: 8),
 
                           ExerciseTile(
-                            name: 'Tríceps Pulley',
+                            name: 'Triceps Pulley',
                             series: '4x12',
                             tempo: "1'30\"",
                             image: 'TricepsPulley.png',
@@ -150,7 +150,7 @@ class TreinoView extends StatelessWidget {
                           SizedBox(height: 8),
 
                           ExerciseTile(
-                            name: 'Tríceps Paralela',
+                            name: 'Triceps Paralela',
                             series: '4x12',
                             tempo: "1'30\"",
                             image: 'TricepsParalela.png',
@@ -160,7 +160,7 @@ class TreinoView extends StatelessWidget {
                     ),
                   ),
 
-                  // Botão Finalizar
+                  // Botao Finalizar
                   const SizedBox(height: 10),
                   Center(
                     child: SizedBox(

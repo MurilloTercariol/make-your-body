@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import 'package:projeto_app/controller/cadastro_controller.dart';
+import 'package:get_it/get_it.dart';
+import 'package:projeto_app/controller/cadastro_controller_basic.dart';
 
 class CadastroView extends StatefulWidget {
   const CadastroView({super.key});
@@ -10,7 +10,7 @@ class CadastroView extends StatefulWidget {
 }
 
 class _CadastroViewState extends State<CadastroView> {
-  final CadastroController _cadastroController = CadastroController();
+  late final CadastroControllerBasic _cadastroController;
 
   // Controllers para os campos de texto
   final TextEditingController _nomeController = TextEditingController();
@@ -29,6 +29,12 @@ class _CadastroViewState extends State<CadastroView> {
   bool _resilienciaChecked = false;
   bool _termosChecked = false;
   bool _dependeChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cadastroController = GetIt.instance.get<CadastroControllerBasic>();
+  }
 
   @override
   Widget build(BuildContext context) {

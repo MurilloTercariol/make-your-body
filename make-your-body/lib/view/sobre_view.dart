@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class SobreView extends StatefulWidget {
   const SobreView({super.key});
 
@@ -12,13 +11,13 @@ class _SobreViewState extends State<SobreView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(0, 0, 0, 0), 
+      backgroundColor: Color.fromARGB(0, 0, 0, 0),
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height:15),
+            const SizedBox(height: 15),
 
-            // Título
+            // Titulo
             const Text(
               'QUEM SOMOS',
               style: TextStyle(
@@ -31,11 +30,11 @@ class _SobreViewState extends State<SobreView> {
 
             const SizedBox(height: 20),
 
-            // Retângulo 1
+            // Retangulo 1
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Container(
-                height: 300, 
+                height: 300,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF9C22E),
@@ -50,10 +49,7 @@ class _SobreViewState extends State<SobreView> {
                     'pessoas a realizarem seus treinos na academia de forma mais eficiente. '
                     'Entre suas funcionalidades, estão o registro de peso recorde, adição de peso '
                     'personalizado, marcação de exercícios como concluídos e muito mais.',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.black, fontSize: 16),
                   ),
                 ),
               ),
@@ -65,7 +61,7 @@ class _SobreViewState extends State<SobreView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Container(
-                height: 180, 
+                height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF9C22E),
@@ -77,10 +73,7 @@ class _SobreViewState extends State<SobreView> {
                     'Nomes Integrantes: \n'
                     'Kauã Henrique Medeiros da Silva \n'
                     'Murillo Oliveira Terçariol ',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.black, fontSize: 16),
                   ),
                 ),
               ),
@@ -89,7 +82,7 @@ class _SobreViewState extends State<SobreView> {
             const Spacer(),
 
             Image.asset(
-              'Logo2.png', 
+              'Logo2.png',
               width: 125,
               height: 125,
               fit: BoxFit.contain,
@@ -107,8 +100,10 @@ class _SobreViewState extends State<SobreView> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 12,
+                  ),
                 ),
                 child: const Text(
                   'BACK',
