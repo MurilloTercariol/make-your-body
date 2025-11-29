@@ -108,7 +108,10 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
 
               // Barra de pesquisa
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: TextField(
                   onChanged: (value) {
                     setState(() {
@@ -134,15 +137,11 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
                     fillColor: Colors.grey[900],
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFF9C22E),
-                      ),
+                      borderSide: const BorderSide(color: Color(0xFFF9C22E)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.grey,
-                      ),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -226,12 +225,14 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
   Widget _buildListaExercicios() {
     // Filtrar exercícios por pesquisa (case-insensitive)
     final exerciciosFiltrados = _controller.exerciciosFiltrados
-        .where((exercicio) =>
-            exercicio.name.toLowerCase().contains(_pesquisa.toLowerCase()) ||
-            _controller
-                .nomeMusculoPortugues(exercicio.muscle)
-                .toLowerCase()
-                .contains(_pesquisa.toLowerCase()))
+        .where(
+          (exercicio) =>
+              exercicio.name.toLowerCase().contains(_pesquisa.toLowerCase()) ||
+              _controller
+                  .nomeMusculoPortugues(exercicio.muscle)
+                  .toLowerCase()
+                  .contains(_pesquisa.toLowerCase()),
+        )
         .toList();
 
     if (_controller.exerciciosFiltrados.isEmpty) {
@@ -626,6 +627,14 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
     Navigator.pop(context); // Fechar dialog do nome
 
     if (sucesso) {
+      // Voltar para a tela anterior ANTES de mostrar a SnackBar
+      Navigator.pop(context);
+
+      // Aguardar um pouco para garantir que a navegação terminou
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('✅ Treino "$nome" salvo com sucesso!'),
@@ -638,7 +647,6 @@ class _MonteTreinoViewState extends State<MonteTreinoView> {
           ),
         ),
       );
-      Navigator.pop(context); // Voltar para a tela anterior
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

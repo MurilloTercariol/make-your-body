@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../controller/meustreinos_controller.dart';
 import '../model/treino_salvo_model.dart';
 
@@ -14,6 +16,8 @@ class _MeusTreinosViewState extends State<MeusTreinosView>
     with WidgetsBindingObserver {
   late final MeusTreinosController _controller;
   String _pesquisa = '';
+  bool _ordenarMaisRecente =
+      true; // true = mais recente primeiro, false = mais antigo primeiro
 
   @override
   void initState() {
@@ -62,6 +66,20 @@ class _MeusTreinosViewState extends State<MeusTreinosView>
         ),
         actions: [
           IconButton(
+            icon: Icon(
+              _ordenarMaisRecente ? Icons.arrow_downward : Icons.arrow_upward,
+              color: const Color(0xFFF9C22E),
+            ),
+            tooltip: _ordenarMaisRecente
+                ? 'Mais recente primeiro'
+                : 'Mais antigo primeiro',
+            onPressed: () {
+              setState(() {
+                _ordenarMaisRecente = !_ordenarMaisRecente;
+              });
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFFF9C22E)),
             onPressed: _carregarTreinos,
           ),
@@ -74,22 +92,62 @@ class _MeusTreinosViewState extends State<MeusTreinosView>
           ),
         ],
       ),
-      body: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, _) {
-          if (_controller.isLoading) {
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('treinos')
+            .doc(FirebaseAuth.instance.currentUser?.uid ?? '')
+            .collection('meus_treinos')
+            .orderBy('dataCriacao', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(color: Color(0xFFF9C22E)),
             );
           }
 
-          // Filtrar treinos baseado na pesquisa
-          final treinosFiltrados = _controller.treinos
-              .where((treino) =>
-                  treino.nome.toLowerCase().contains(_pesquisa.toLowerCase()))
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Erro ao carregar treinos',
+                style: TextStyle(color: Colors.red),
+              ),
+            );
+          }
+
+          final treinos = snapshot.data?.docs
+              .map(
+                (doc) => TreinoSalvoModel.fromJson(
+                  doc.data() as Map<String, dynamic>,
+                ),
+              )
               .toList();
 
-          if (_controller.treinos.isEmpty) {
+          // Filtrar treinos baseado na pesquisa
+          var treinosFiltrados =
+              treinos
+                  ?.where(
+                    (treino) => treino.nome.toLowerCase().contains(
+                      _pesquisa.toLowerCase(),
+                    ),
+                  )
+                  .toList() ??
+              [];
+
+          // Ordenar treinos
+          treinosFiltrados.sort((a, b) {
+            if (_ordenarMaisRecente) {
+              return b.dataCriacao.compareTo(
+                a.dataCriacao,
+              ); // Mais recente primeiro
+            } else {
+              return a.dataCriacao.compareTo(
+                b.dataCriacao,
+              ); // Mais antigo primeiro
+            }
+          });
+
+          if (treinosFiltrados.isEmpty) {
             return _buildEstadoVazio();
           }
 
@@ -123,15 +181,11 @@ class _MeusTreinosViewState extends State<MeusTreinosView>
                     fillColor: Colors.grey[900],
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFF9C22E),
-                      ),
+                      borderSide: const BorderSide(color: Color(0xFFF9C22E)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.grey,
-                      ),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -145,38 +199,17 @@ class _MeusTreinosViewState extends State<MeusTreinosView>
               ),
               // Lista de treinos
               Expanded(
-                child: treinosFiltrados.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.search_off,
-                              size: 48,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Nenhum treino encontrado para "$_pesquisa"',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _carregarTreinos,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: treinosFiltrados.length,
-                          itemBuilder: (context, index) {
-                            final treino = treinosFiltrados[index];
-                            return _buildCardTreino(treino);
-                          },
-                        ),
-                      ),
+                child: RefreshIndicator(
+                  onRefresh: _carregarTreinos,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: treinosFiltrados.length,
+                    itemBuilder: (context, index) {
+                      final treino = treinosFiltrados[index];
+                      return _buildCardTreino(treino);
+                    },
+                  ),
+                ),
               ),
             ],
           );

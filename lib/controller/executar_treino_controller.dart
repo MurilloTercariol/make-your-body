@@ -20,6 +20,9 @@ class ExecutarTreinoController extends ChangeNotifier {
   int _seriesPorExercicio = 3; // Padrão 3 séries por exercício
   bool _isTimerEntreExercicios = false;
 
+  // Mapa para rastrear séries completadas por exercício
+  Map<int, int> _seriesCompletadasPorExercicio = {};
+
   // Getters
   TreinoSalvoModel? get treinoAtual => _treinoAtual;
   int get exercicioAtualIndex => _exercicioAtualIndex;
@@ -61,6 +64,7 @@ class ExecutarTreinoController extends ChangeNotifier {
     _isDescansando = false;
     _isTimerEntreExercicios = false;
     _tempoRestanteSegundos = 0;
+    _seriesCompletadasPorExercicio = {}; // Limpar progresso anterior
     _pararTimer();
     notifyListeners();
   }
@@ -119,6 +123,9 @@ class ExecutarTreinoController extends ChangeNotifier {
   void finalizarSerie() {
     if (_treinoAtual == null) return;
 
+    // Salvar progresso da série atual
+    _seriesCompletadasPorExercicio[_exercicioAtualIndex] = _serieAtual;
+
     if (_serieAtual < _seriesPorExercicio) {
       // Ainda há séries restantes neste exercício
       _serieAtual++;
@@ -126,10 +133,13 @@ class ExecutarTreinoController extends ChangeNotifier {
       _iniciarDescanso();
     } else {
       // Todas as séries completas, ir para próximo exercício
-      _serieAtual = 1;
       if (!isUltimoExercicio) {
-        _isTimerEntreExercicios = true;
         _exercicioAtualIndex++;
+        // Restaurar progresso do próximo exercício ou começar do zero
+        _serieAtual =
+            (_seriesCompletadasPorExercicio[_exercicioAtualIndex] ?? 0) + 1;
+        if (_serieAtual > _seriesPorExercicio) _serieAtual = 1;
+        _isTimerEntreExercicios = true;
         _iniciarDescanso();
       } else {
         // Último exercício finalizado
@@ -196,7 +206,10 @@ class ExecutarTreinoController extends ChangeNotifier {
 
     if (!isUltimoExercicio) {
       _exercicioAtualIndex++;
-      _serieAtual = 1; // Reinicia contador de séries
+      // Restaurar progresso ou começar do 1
+      _serieAtual =
+          (_seriesCompletadasPorExercicio[_exercicioAtualIndex] ?? 0) + 1;
+      if (_serieAtual > _seriesPorExercicio) _serieAtual = 1;
     } else {
       finalizarTreino();
     }
@@ -212,7 +225,10 @@ class ExecutarTreinoController extends ChangeNotifier {
     _tempoRestanteSegundos = 0;
     _isTimerEntreExercicios = false;
     _exercicioAtualIndex--;
-    _serieAtual = 1; // Reinicia contador de séries
+    // Restaurar progresso ou começar do 1
+    _serieAtual =
+        (_seriesCompletadasPorExercicio[_exercicioAtualIndex] ?? 0) + 1;
+    if (_serieAtual > _seriesPorExercicio) _serieAtual = 1;
     notifyListeners();
   }
 
@@ -225,6 +241,7 @@ class ExecutarTreinoController extends ChangeNotifier {
     _isDescansando = false;
     _isTimerEntreExercicios = false;
     _tempoRestanteSegundos = 0;
+    _seriesCompletadasPorExercicio = {}; // Limpar progresso
     notifyListeners();
   }
 

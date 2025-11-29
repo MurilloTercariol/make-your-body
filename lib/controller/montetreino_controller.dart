@@ -10,6 +10,7 @@ class MontetreinoController extends ChangeNotifier {
   bool _isLoading = false;
   String _erro = '';
   String _filtroMusculo = 'all';
+  bool _jaCarregou = false; // Flag para evitar carregar múltiplas vezes
 
   // Getters
   List<ExercicioModel> get todosExercicios => _todosExercicios;
@@ -37,7 +38,7 @@ class MontetreinoController extends ChangeNotifier {
     'quadriceps',
     'traps',
     'triceps',
-    ];
+  ];
 
   // Mapear nomes dos músculos para português
   String nomeMusculoPortugues(String musculo) {
@@ -81,57 +82,98 @@ class MontetreinoController extends ChangeNotifier {
 
   // Buscar exercícios da API
   Future<void> buscarExercicios() async {
+    // Se já carregou, apenas aplicar o filtro
+    if (_jaCarregou && _todosExercicios.isNotEmpty) {
+      _aplicarFiltro();
+      return;
+    }
+
     _setLoading(true);
     _setErro('');
 
+    // Carregar exercícios de exemplo imediatamente
+    _carregarExerciciosExemplo();
+    _setLoading(false);
+
+    // Buscar da API em segundo plano (opcional)
+    if (!_jaCarregou) {
+      _jaCarregou = true;
+      _buscarExerciciosAPI();
+    }
+  }
+
+  // Buscar exercícios da API em segundo plano
+  Future<void> _buscarExerciciosAPI() async {
     try {
-      // Buscar exercícios de diferentes grupos musculares
       List<ExercicioModel> todosExercicios = [];
 
-      for (String musculo in [
-        'all',
+      // Buscar todos os grupos musculares principais
+      final musculos = [
+        'chest',
+        'biceps',
+        'triceps',
+        'quadriceps',
+        'hamstrings',
+        'calves',
+        'lats',
+        'middle_back',
+        'lower_back',
         'abductors',
         'adductors',
-        'biceps',
-        'calves',
-        'chest',
-        'forearms',
         'glutes',
-        'hamstrings',
-        'lats',
-        'lower_back',
-        'middle_back',
-        'neck',
-        'quadriceps',
+        'forearms',
         'traps',
-        'triceps',
-      ]) {
-        final response = await http.get(
-          Uri.parse('https://api.api-ninjas.com/v1/exercises?muscle=$musculo'),
-          headers: {'X-Api-Key': 'FKdtPSPnKdsgizlyPhcMfw==sdSlYZVhhP4JpoLZ'},
-        );
+        'neck',
+      ];
 
-        if (response.statusCode == 200) {
-          List<dynamic> data = json.decode(response.body);
-          List<ExercicioModel> exerciciosMusculo = data
-              .map((json) => ExercicioModel.fromJson(json))
-              .toList();
-          todosExercicios.addAll(exerciciosMusculo);
+      // Fazer requisições em paralelo (mais rápido que sequencial)
+      final futures = musculos.map((musculo) async {
+        try {
+          final response = await http
+              .get(
+                Uri.parse(
+                  'https://api.api-ninjas.com/v1/exercises?muscle=$musculo&offset=0',
+                ),
+                headers: {
+                  'X-Api-Key': 'FKdtPSPnKdsgizlyPhcMfw==sdSlYZVhhP4JpoLZ',
+                },
+              )
+              .timeout(const Duration(seconds: 5));
+
+          if (response.statusCode == 200) {
+            List<dynamic> data = json.decode(response.body);
+            return data.map((json) => ExercicioModel.fromJson(json)).toList();
+          }
+        } catch (e) {
+          debugPrint('Erro ao buscar $musculo: $e');
         }
+        return <ExercicioModel>[];
+      });
+
+      // Aguardar todas as requisições
+      final resultados = await Future.wait(futures);
+
+      // Combinar todos os resultados
+      for (var lista in resultados) {
+        todosExercicios.addAll(lista);
       }
 
       if (todosExercicios.isNotEmpty) {
-        _todosExercicios = todosExercicios;
+        // Combinar com exercícios de exemplo sem duplicar
+        final idsExemplo = _todosExercicios.map((e) => e.id).toSet();
+        final exerciciosNovos = todosExercicios
+            .where((e) => !idsExemplo.contains(e.id))
+            .toList();
+
+        _todosExercicios.addAll(exerciciosNovos);
         _aplicarFiltro();
-      } else {
-        _carregarExerciciosExemplo();
+        notifyListeners();
+        debugPrint('✅ ${exerciciosNovos.length} exercícios da API adicionados');
       }
     } catch (e) {
-      // Se houver erro de conexão, usar exercícios de exemplo
-      _carregarExerciciosExemplo();
+      // Ignora erro - já temos exercícios de exemplo
+      debugPrint('Erro ao buscar da API: $e');
     }
-
-    _setLoading(false);
   }
 
   // Carregar exercícios de exemplo (backup)

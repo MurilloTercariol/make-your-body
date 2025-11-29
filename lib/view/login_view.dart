@@ -49,8 +49,8 @@ class _LoginViewState extends State<LoginView> {
         );
 
         if (erro == null) {
-          // Login bem-sucedido - ir para a tela principal
-          Navigator.pushNamed(context, '/home');
+          // Login bem-sucedido - ir para a splash que pré-carrega dados
+          Navigator.pushReplacementNamed(context, '/splash');
         }
         // Se houver erro, o SnackBar já foi mostrado no controller
       },
@@ -100,19 +100,19 @@ class _LoginViewState extends State<LoginView> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 80),
-              kIsWeb 
-                ? Image.network(
-                    'assets/assets/Logo2.png',
-                    width: 175,
-                    height: 175,
-                    fit: BoxFit.contain,
-                  )
-                : Image.asset(
-                    'Logo2.png',
-                    width: 175,
-                    height: 175,
-                    fit: BoxFit.contain,
-                  ),
+              kIsWeb
+                  ? Image.network(
+                      'assets/assets/Logo2.png',
+                      width: 175,
+                      height: 175,
+                      fit: BoxFit.contain,
+                    )
+                  : Image.asset(
+                      'Logo2.png',
+                      width: 175,
+                      height: 175,
+                      fit: BoxFit.contain,
+                    ),
               const SizedBox(height: 30),
 
               Container(
