@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_final_fields
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -29,49 +29,6 @@ class LoginController extends ChangeNotifier {
       return 'Senha deve ter pelo menos 6 caracteres';
     }
     return null;
-  }
-
-  Future<String?> login({required String email, required String senha}) async {
-    _setLoading(true);
-
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: senha);
-      _setLoading(false);
-      return null; // null = sucesso
-    } on FirebaseAuthException catch (e) {
-      _setLoading(false);
-      switch (e.code) {
-        case 'user-not-found':
-          return 'Usuário não encontrado';
-        case 'wrong-password':
-        case 'invalid-credential':
-          return 'Email ou senha incorretos';
-        case 'invalid-email':
-          return 'Email inválido';
-        case 'user-disabled':
-          return 'Conta desativada';
-        case 'too-many-requests':
-          return 'Muitas tentativas. Tente novamente mais tarde';
-        default:
-          return 'Email ou senha incorretos';
-      }
-    } catch (e) {
-      _setLoading(false);
-      return 'Erro inesperado: ${e.toString()}';
-    }
-  }
-
-  void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
-  }
-
-  // Método para autenticação simples
-  bool authenticate() {
-    if (email.isEmpty || password.isEmpty) {
-      return false;
-    }
-    return true;
   }
 
   // Login com Firebase Auth

@@ -28,13 +28,6 @@ class CadastroController {
     return null; // null significa que não há erros
   }
 
-  // Simular cadastro
-  Future<bool> simularCadastro() async {
-    await Future.delayed(const Duration(seconds: 2));
-    return true; // Sempre retorna sucesso na simulação
-  }
-
-  //void cadastrarUsuario(String text, String text2, String text3) {}
   Future<String?> cadastrarUsuario({
     required String nome,
     required String email,
